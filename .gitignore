@@ -21,6 +21,9 @@ ENV/
 # OS
 .DS_Store
 Thumbs.db
+results\README.md
+results/
+
 
 # Données et modèles (volumineux)
 data/
@@ -38,7 +41,6 @@ checkpoints/
 
 # Jupyter
 .ipynb_checkpoints/
-*.ipynb
 
 # Cache
 .cache/
