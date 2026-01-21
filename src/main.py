@@ -25,10 +25,15 @@ from datetime import datetime
 from tqdm import tqdm
 from typing import Dict, List, Tuple
 
-# Imports locaux
-from src.config import parse_args, print_config, Config
-from src.dataset import get_loaders
-from src.model import create_model
+# Imports locaux - support exécution directe et module
+try:
+    from src.config import parse_args, print_config, Config
+    from src.dataset import get_loaders
+    from src.model import create_model
+except ImportError:
+    from config import parse_args, print_config, Config
+    from dataset import get_loaders
+    from model import create_model
 
 
 def set_seed(seed: int) -> None:
