@@ -19,6 +19,13 @@ import torch.nn.functional as F
 from typing import Tuple, Optional, List
 import warnings
 
+# Import conditionnel pour OpenCV
+try:
+    import cv2
+    CV2_AVAILABLE = True
+except ImportError:
+    CV2_AVAILABLE = False
+
 
 # ============================================================================
 # NORMALISATION STANDARD (ImageNet pour MobileViT)
@@ -265,9 +272,7 @@ class RealVideoDataset(Dataset):
     
     def _load_video_opencv(self, path: str) -> List[torch.Tensor]:
         """Charge une vraie vidéo avec OpenCV."""
-        try:
-            import cv2
-        except ImportError:
+        if not CV2_AVAILABLE:
             raise ImportError("opencv-python non installé. pip install opencv-python-headless")
         
         frames = []
@@ -293,9 +298,7 @@ class RealVideoDataset(Dataset):
     
     def _load_image(self, path: str) -> List[torch.Tensor]:
         """Charge une image et la duplique pour créer une séquence."""
-        try:
-            import cv2
-        except ImportError:
+        if not CV2_AVAILABLE:
             raise ImportError("opencv-python non installé. pip install opencv-python-headless")
         
         img = cv2.imread(path)
@@ -385,14 +388,32 @@ def get_loaders(config) -> Tuple[DataLoader, DataLoader]:
         )
         
     else:  # mode == "real"
+        # Vérifier OpenCV
+        if not CV2_AVAILABLE:
+            raise ImportError(
+                "opencv-python non installé pour le mode REAL.\n"
+                "Installez-le avec: pip install opencv-python-headless"
+            )
+        
+        # Télécharger HyperKvasir VIDÉOS si nécessaire (25 GB)
+        # Le code est polymorphe: il gère vidéos .mp4 ET images .jpg
+        try:
+            from data_utils import prepare_hyperkvasir
+        except ImportError:
+            from src.data_utils import prepare_hyperkvasir
+        
+        # use_videos=True pour télécharger les vraies vidéos (25 GB)
+        # Le serveur du prof aura les ressources
+        real_data_dir = prepare_hyperkvasir(config.data_dir, use_videos=True)
+        
         train_dataset = RealVideoDataset(
-            data_dir=config.data_dir,
+            data_dir=real_data_dir,
             split="train",
             seq_len=config.seq_len,
             img_size=config.img_size
         )
         val_dataset = RealVideoDataset(
-            data_dir=config.data_dir,
+            data_dir=real_data_dir,
             split="val",
             seq_len=config.seq_len,
             img_size=config.img_size
