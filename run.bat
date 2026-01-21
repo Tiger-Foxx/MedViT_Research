@@ -1,63 +1,59 @@
 @echo off
 REM ============================================================================
-REM MedViT-CAMIL Run Script (Windows)
+REM MedViT-CAMIL Run Script V2 (Windows)
 REM ============================================================================
-REM Script universel pour lancer l'entraînement
-REM
 REM Usage:
-REM   run.bat test              # Mode test (données synthétiques, rapide)
-REM   run.bat real              # Mode real (NoduleMNIST3D)
-REM   run.bat test --epochs 5   # Mode test avec 5 époques
-REM   run.bat --dry-run         # Vérifier la config sans entraîner
-REM
+REM   run.bat test              # Mode test (donnees synthetiques)
+REM   run.bat proxy             # Mode proxy (NoduleMNIST3D)
+REM   run.bat real              # Mode real (HyperKvasir)
+REM   run.bat test --epochs 5   # Avec arguments
+REM   run.bat --dry-run         # Verification sans entrainement
 REM ============================================================================
 
 echo.
 echo ============================================================
-echo      MedViT-CAMIL: Medical Video Analysis
-echo      Context-Aware Multiple Instance Learning
+echo      MedViT-CAMIL V2: Medical Video Analysis
+echo      3 Modes: TEST / PROXY / REAL
 echo ============================================================
 echo.
 
-REM Changer vers le répertoire du script
 cd /d "%~dp0"
 
-REM Vérifier Python
+REM Python
 where python >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
-    echo [ERROR] Python n'est pas installé ou pas dans le PATH!
+    echo [ERROR] Python non trouve!
     exit /b 1
 )
 
-echo [INFO] Python version:
+echo [INFO] Python:
 python --version
 
-REM Vérifier PyTorch
+REM Dependances
 python -c "import torch; print(f'[INFO] PyTorch: {torch.__version__}')" 2>nul
 if %ERRORLEVEL% NEQ 0 (
-    echo [ERROR] PyTorch n'est pas installé. Executez: pip install -r requirements.txt
+    echo [ERROR] PyTorch manquant. pip install -r requirements.txt
     exit /b 1
 )
 
-REM Vérifier timm
 python -c "import timm; print(f'[INFO] timm: {timm.__version__}')" 2>nul
 if %ERRORLEVEL% NEQ 0 (
-    echo [ERROR] timm n'est pas installe. Executez: pip install timm
+    echo [ERROR] timm manquant. pip install timm
     exit /b 1
 )
 
-REM Vérifier GPU
-python -c "import torch; print(f'[INFO] CUDA: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else \"Non disponible (CPU)\"}')"
+REM GPU
+python -c "import torch; print(f'[INFO] CUDA: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else \"CPU\"}')"
 
-REM Créer les répertoires
+REM Repertoires
 if not exist "results" mkdir results
 if not exist "data" mkdir data
 
-REM Mode par défaut
+REM Mode
 set MODE=%1
 if "%MODE%"=="" set MODE=test
 
-REM Préparer les arguments restants
+REM Arguments
 set ARGS=
 :loop
 shift
@@ -67,13 +63,12 @@ goto loop
 :endloop
 
 echo.
-echo [INFO] Lancement en mode: %MODE%
+echo [INFO] Lancement: MODE=%MODE%
 echo.
 
-REM Lancer l'entraînement
-python src/main.py --mode %MODE% %ARGS%
+REM Lancer
+python -m src.main --mode %MODE% %ARGS%
 
 echo.
-echo [SUCCESS] Execution terminee!
-echo [INFO] Resultats dans: .\results\
+echo [SUCCESS] Termine! Resultats: .\results\
 echo.

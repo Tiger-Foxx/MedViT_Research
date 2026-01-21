@@ -1,17 +1,22 @@
 """
-MedViT-CAMIL Configuration Module
-=================================
-Gère les arguments et configurations pour les modes TEST et REAL.
+MedViT-CAMIL Configuration Module V2
+=====================================
+Gère les arguments et configurations pour les 3 modes:
+- TEST: Données synthétiques (validation locale rapide)
+- PROXY: NoduleMNIST3D (preuve scientifique intermédiaire)
+- REAL: HyperKvasir + vraies vidéos OpenCV (serveur professeur)
 
 Usage:
-    python main.py --mode test   # Validation locale rapide
-    python main.py --mode real   # Production avec NoduleMNIST3D
+    python -m src.main --mode test    # Laptop - données synthétiques
+    python -m src.main --mode proxy   # Validation - MedMNIST3D
+    python -m src.main --mode real    # Serveur - HyperKvasir/vidéos réelles
 """
 
 import argparse
 import torch
+import os
 from dataclasses import dataclass
-from typing import Literal
+from typing import Literal, Optional
 
 
 @dataclass
@@ -19,7 +24,7 @@ class Config:
     """Configuration centralisée du projet MedViT-CAMIL."""
     
     # Mode d'exécution
-    mode: Literal["test", "real"]
+    mode: Literal["test", "proxy", "real"]
     
     # Paramètres de séquence
     seq_len: int          # Nombre de frames/slices dans la séquence
@@ -38,8 +43,9 @@ class Config:
     num_classes: int      # Nombre de classes (2 pour binaire)
     
     # Paramètres de données
-    num_train_samples: int   # Nombre d'échantillons d'entraînement (mode test)
-    num_val_samples: int     # Nombre d'échantillons de validation (mode test)
+    num_train_samples: int   # Nombre d'échantillons (mode test uniquement)
+    num_val_samples: int     # Nombre d'échantillons (mode test uniquement)
+    num_workers: int         # Workers pour DataLoader
     
     # Device
     device: torch.device
@@ -52,7 +58,10 @@ class Config:
     seed: int
 
 
-# Configurations prédéfinies
+# ============================================================================
+# CONFIGURATIONS PRÉDÉFINIES POUR CHAQUE MODE
+# ============================================================================
+
 TEST_CONFIG = {
     "seq_len": 16,
     "img_size": 224,
@@ -61,17 +70,18 @@ TEST_CONFIG = {
     "batch_size": 4,
     "learning_rate": 1e-4,
     "weight_decay": 1e-5,
-    "feature_dim": 512,      # MobileViT-S output dim
+    "feature_dim": 512,
     "hidden_dim": 128,
     "num_classes": 2,
     "num_train_samples": 100,
-    "num_val_samples": 20,
+    "num_val_samples": 30,
+    "num_workers": 0,        # 0 pour Windows compatibility
     "results_dir": "./results",
     "data_dir": "./data",
     "seed": 42,
 }
 
-REAL_CONFIG = {
+PROXY_CONFIG = {
     "seq_len": 28,           # Profondeur NoduleMNIST3D
     "img_size": 224,
     "in_channels": 3,
@@ -82,10 +92,30 @@ REAL_CONFIG = {
     "feature_dim": 512,
     "hidden_dim": 128,
     "num_classes": 2,
-    "num_train_samples": -1,  # Ignoré en mode real
+    "num_train_samples": -1,  # Ignoré
     "num_val_samples": -1,
+    "num_workers": 0,
     "results_dir": "./results",
     "data_dir": "./data",
+    "seed": 42,
+}
+
+REAL_CONFIG = {
+    "seq_len": 32,           # Séquences plus longues pour vraies vidéos
+    "img_size": 224,
+    "in_channels": 3,
+    "epochs": 50,
+    "batch_size": 16,
+    "learning_rate": 1e-4,
+    "weight_decay": 1e-5,
+    "feature_dim": 512,
+    "hidden_dim": 128,
+    "num_classes": 2,
+    "num_train_samples": -1,
+    "num_val_samples": -1,
+    "num_workers": 4,        # Multi-threading pour serveur
+    "results_dir": "./results",
+    "data_dir": "/app/data/hyperkvasir",  # Chemin Docker
     "seed": 42,
 }
 
@@ -105,7 +135,7 @@ def get_device() -> torch.device:
     return device
 
 
-def parse_args() -> Config:
+def parse_args():
     """Parse les arguments de ligne de commande et retourne une Config."""
     parser = argparse.ArgumentParser(
         description="MedViT-CAMIL: Détection d'anomalies médicales temporelles",
@@ -115,9 +145,9 @@ def parse_args() -> Config:
     parser.add_argument(
         "--mode", 
         type=str, 
-        choices=["test", "real"], 
+        choices=["test", "proxy", "real"], 
         default="test",
-        help="Mode d'exécution: 'test' pour validation locale, 'real' pour NoduleMNIST3D"
+        help="Mode: 'test' (synthétique), 'proxy' (MedMNIST3D), 'real' (HyperKvasir/vidéos)"
     )
     
     parser.add_argument(
@@ -128,7 +158,7 @@ def parse_args() -> Config:
     )
     
     parser.add_argument(
-        "--batch-size",
+        "--batch_size",
         type=int,
         default=None,
         help="Taille du batch (override la config par défaut)"
@@ -151,15 +181,15 @@ def parse_args() -> Config:
     parser.add_argument(
         "--results-dir",
         type=str,
-        default="./results",
+        default=None,
         help="Répertoire pour sauvegarder les résultats"
     )
     
     parser.add_argument(
         "--data-dir",
         type=str,
-        default="./data",
-        help="Répertoire pour les données"
+        default=None,
+        help="Répertoire des données"
     )
     
     parser.add_argument(
@@ -170,8 +200,13 @@ def parse_args() -> Config:
     
     args = parser.parse_args()
     
-    # Sélectionner la configuration de base
-    base_config = TEST_CONFIG.copy() if args.mode == "test" else REAL_CONFIG.copy()
+    # Sélectionner la configuration de base selon le mode
+    if args.mode == "test":
+        base_config = TEST_CONFIG.copy()
+    elif args.mode == "proxy":
+        base_config = PROXY_CONFIG.copy()
+    else:
+        base_config = REAL_CONFIG.copy()
     
     # Override avec les arguments CLI
     if args.epochs is not None:
@@ -180,10 +215,16 @@ def parse_args() -> Config:
         base_config["batch_size"] = args.batch_size
     if args.lr is not None:
         base_config["learning_rate"] = args.lr
+    if args.results_dir is not None:
+        base_config["results_dir"] = args.results_dir
+    if args.data_dir is not None:
+        base_config["data_dir"] = args.data_dir
     
     base_config["seed"] = args.seed
-    base_config["results_dir"] = args.results_dir
-    base_config["data_dir"] = args.data_dir
+    
+    # Créer les répertoires
+    os.makedirs(base_config["results_dir"], exist_ok=True)
+    os.makedirs(base_config["data_dir"], exist_ok=True)
     
     # Créer l'objet Config
     config = Config(
@@ -197,10 +238,16 @@ def parse_args() -> Config:
 
 def print_config(config: Config) -> None:
     """Affiche la configuration de manière formatée."""
+    mode_desc = {
+        "test": "TEST (Données synthétiques - Validation locale)",
+        "proxy": "PROXY (NoduleMNIST3D - Preuve intermédiaire)",
+        "real": "REAL (HyperKvasir/Vidéos - Serveur Production)"
+    }
+    
     print("\n" + "=" * 60)
-    print("CONFIGURATION MedViT-CAMIL")
+    print("CONFIGURATION MedViT-CAMIL V2")
     print("=" * 60)
-    print(f"Mode:              {config.mode.upper()}")
+    print(f"Mode:              {mode_desc.get(config.mode, config.mode)}")
     print(f"Device:            {config.device}")
     print(f"Seed:              {config.seed}")
     print("-" * 60)
@@ -208,17 +255,21 @@ def print_config(config: Config) -> None:
     print(f"  Sequence Length: {config.seq_len}")
     print(f"  Image Size:      {config.img_size}x{config.img_size}")
     print(f"  Channels:        {config.in_channels}")
+    print(f"  Data Directory:  {config.data_dir}")
     if config.mode == "test":
         print(f"  Train Samples:   {config.num_train_samples}")
         print(f"  Val Samples:     {config.num_val_samples}")
-    else:
+    elif config.mode == "proxy":
         print("  Dataset:         NoduleMNIST3D (téléchargement auto)")
+    else:
+        print("  Dataset:         HyperKvasir + vidéos OpenCV")
     print("-" * 60)
     print("ENTRAÎNEMENT:")
     print(f"  Epochs:          {config.epochs}")
     print(f"  Batch Size:      {config.batch_size}")
     print(f"  Learning Rate:   {config.learning_rate}")
     print(f"  Weight Decay:    {config.weight_decay}")
+    print(f"  Num Workers:     {config.num_workers}")
     print("-" * 60)
     print("MODÈLE:")
     print(f"  Feature Dim:     {config.feature_dim}")
@@ -228,7 +279,6 @@ def print_config(config: Config) -> None:
 
 
 if __name__ == "__main__":
-    # Test de la configuration
     config, dry_run = parse_args()
     print_config(config)
     

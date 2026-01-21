@@ -1,111 +1,85 @@
 #!/bin/bash
 # ============================================================================
-# MedViT-CAMIL Run Script
+# MedViT-CAMIL Run Script V2
 # ============================================================================
-# Script universel pour lancer l'entraînement
-#
 # Usage:
-#   ./run.sh test              # Mode test (données synthétiques, rapide)
-#   ./run.sh real              # Mode real (NoduleMNIST3D)
-#   ./run.sh test --epochs 5   # Mode test avec 5 époques
+#   ./run.sh test              # Mode test (données synthétiques)
+#   ./run.sh proxy             # Mode proxy (NoduleMNIST3D)
+#   ./run.sh real              # Mode real (HyperKvasir + vidéos)
+#   ./run.sh test --epochs 5   # Avec arguments personnalisés
 #   ./run.sh --dry-run         # Vérifier la config sans entraîner
-#
 # ============================================================================
 
-set -e  # Exit on error
+set -e
 
-# Couleurs pour les logs
+# Couleurs
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-# Fonction de logging
-log_info() {
-    echo -e "${BLUE}[INFO]${NC} $1"
-}
+log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
+log_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
+log_warning() { echo -e "${YELLOW}[WARNING]${NC} $1"; }
+log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
-log_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
-}
-
-log_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
-}
-
-log_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
-
-# Banner
 echo ""
 echo "============================================================"
-echo "     MedViT-CAMIL: Medical Video Analysis"
-echo "     Context-Aware Multiple Instance Learning"
+echo "     MedViT-CAMIL V2: Medical Video Analysis"
+echo "     3 Modes: TEST | PROXY | REAL"
 echo "============================================================"
 echo ""
 
-# Déterminer le répertoire du script
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$SCRIPT_DIR"
 
-# Vérifier Python
-if ! command -v python &> /dev/null; then
-    if command -v python3 &> /dev/null; then
-        PYTHON_CMD="python3"
-    else
-        log_error "Python n'est pas installé!"
-        exit 1
-    fi
-else
-    PYTHON_CMD="python"
-fi
-
+# Python
+PYTHON_CMD="python"
+command -v python3 &> /dev/null && PYTHON_CMD="python3"
 log_info "Python: $($PYTHON_CMD --version)"
 
-# Vérifier les dépendances critiques
+# Dépendances
 log_info "Vérification des dépendances..."
+$PYTHON_CMD -c "import torch; print(f'PyTorch: {torch.__version__}')" || exit 1
+$PYTHON_CMD -c "import timm; print(f'timm: {timm.__version__}')" || exit 1
 
-$PYTHON_CMD -c "import torch; print(f'PyTorch: {torch.__version__}')" 2>/dev/null || {
-    log_error "PyTorch n'est pas installé. Exécutez: pip install -r requirements.txt"
-    exit 1
-}
+# GPU
+$PYTHON_CMD -c "import torch; print(f'CUDA: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else \"CPU\"}')"
 
-$PYTHON_CMD -c "import timm; print(f'timm: {timm.__version__}')" 2>/dev/null || {
-    log_error "timm n'est pas installé. Exécutez: pip install timm"
-    exit 1
-}
+# Répertoires
+mkdir -p results data
 
-# Vérifier GPU
-$PYTHON_CMD -c "
-import torch
-if torch.cuda.is_available():
-    print(f'CUDA: {torch.cuda.get_device_name(0)}')
-else:
-    print('CUDA: Non disponible (utilisation CPU)')
-"
-
-# Créer les répertoires nécessaires
-mkdir -p results
-mkdir -p data
-
-# Mode par défaut
+# Mode
 MODE="${1:-test}"
 
-# Shift pour passer les arguments restants
-if [[ "$MODE" == "test" ]] || [[ "$MODE" == "real" ]]; then
+# Mode REAL: téléchargement HyperKvasir
+if [ "$MODE" = "real" ]; then
+    DATA_DIR="./data/hyperkvasir"
+    if [ ! -d "$DATA_DIR" ] || [ -z "$(ls -A $DATA_DIR 2>/dev/null)" ]; then
+        log_warning "Mode REAL: Téléchargement HyperKvasir (~2 Go)..."
+        mkdir -p $DATA_DIR
+        wget -q --show-progress https://datasets.simula.no/hyper-kvasir/hyper-kvasir-labeled-images.zip -O dataset.zip
+        log_info "Extraction..."
+        unzip -q dataset.zip -d temp_unzip
+        mkdir -p $DATA_DIR/abnormal $DATA_DIR/normal
+        mv temp_unzip/*/lower-gi-tract/pathological-findings/*/* $DATA_DIR/abnormal/ 2>/dev/null || true
+        mv temp_unzip/*/lower-gi-tract/quality-of-mucosal-views/*/* $DATA_DIR/normal/ 2>/dev/null || true
+        rm -rf dataset.zip temp_unzip
+        log_success "Données installées!"
+    fi
+fi
+
+# Lancement
+if [[ "$MODE" == "test" ]] || [[ "$MODE" == "proxy" ]] || [[ "$MODE" == "real" ]]; then
     shift || true
 fi
 
-# Lancer l'entraînement
 echo ""
-log_info "Lancement en mode: ${MODE^^}"
+log_info "Lancement: MODE=${MODE^^}"
 echo ""
 
-$PYTHON_CMD src/main.py --mode "$MODE" "$@"
+$PYTHON_CMD -m src.main --mode "$MODE" "$@"
 
 echo ""
-log_success "Exécution terminée!"
-log_info "Résultats dans: ./results/"
-echo ""
+log_success "Terminé! Résultats: ./results/"
