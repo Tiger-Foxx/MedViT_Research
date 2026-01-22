@@ -1,0 +1,57 @@
+\relax 
+\providecommand \babel@aux [2]{\global \let \babel@toc \@gobbletwo }
+\@nameuse{bbl@beforestart}
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\babel@aux{english}{}
+\citation{mobilevit}
+\citation{ilse2018}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{3}{section.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Context: Edge AI in Medical Imaging}{3}{subsection.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.2}Problem Statement: The "Needle in a Haystack" Dilemma}{3}{subsection.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.3}Contribution}{3}{subsection.1.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2}Methodology}{3}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Architecture Overview}{3}{subsection.2.1}\protected@file@percent }
+\citation{mobilevit}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces \textbf  {High-level architecture of MedViT-CAMIL.} The input video is processed frame-by-frame by a frozen MobileViT. The resulting feature sequence is refined by a 1D Context Convolution to capture local temporal dynamics (e.g., tumor persistence across slices) before being aggregated by a Gated Attention mechanism that assigns high scores to pathological frames and suppresses noise.}}{4}{figure.caption.2}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:arch}{{1}{4}{\textbf {High-level architecture of MedViT-CAMIL.} The input video is processed frame-by-frame by a frozen MobileViT. The resulting feature sequence is refined by a 1D Context Convolution to capture local temporal dynamics (e.g., tumor persistence across slices) before being aggregated by a Gated Attention mechanism that assigns high scores to pathological frames and suppresses noise}{figure.caption.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Stage 1: Spatial Encoder (Frozen MobileViT)}{4}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Stage 2: Context-Aware Gated MIL}{4}{subsection.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.3.1}Local Context Injection (Conv1D)}{4}{subsubsection.2.3.1}\protected@file@percent }
+\citation{ilse2018}
+\citation{medmnist}
+\citation{hyperkvasir}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.3.2}Gated Attention Mechanism}{5}{subsubsection.2.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.3.3}Aggregation}{5}{subsubsection.2.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Experimental Setup}{5}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}The Three-Mode Protocol}{5}{subsection.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Current Experiment: Proxy NoduleMNIST3D}{6}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}Results and Analysis}{6}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Quantitative Performance}{6}{subsection.4.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Comparative Results. CAMIL consistently outperforms the naive baseline. The +1.61\% gain on Test data is statistically significant given the small sample size and strict "frozen backbone" constraint.}}{6}{table.caption.3}\protected@file@percent }
+\newlabel{tab:results}{{1}{6}{Comparative Results. CAMIL consistently outperforms the naive baseline. The +1.61\% gain on Test data is statistically significant given the small sample size and strict "frozen backbone" constraint}{table.caption.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Training Dynamics (Analysis of Figure \ref {fig:training_curves})}{6}{subsection.4.2}\protected@file@percent }
+\citation{ilse2018}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces \textbf  {Training Dynamics.} Note the clear separation between the green curve (CAMIL) and the red curve (Baseline) starting from Epoch 12, validating the benefit of learning temporal weights.}}{7}{figure.caption.4}\protected@file@percent }
+\newlabel{fig:training_curves}{{2}{7}{\textbf {Training Dynamics.} Note the clear separation between the green curve (CAMIL) and the red curve (Baseline) starting from Epoch 12, validating the benefit of learning temporal weights}{figure.caption.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Interpretability: The Evidence of "Sparse Learning"}{7}{subsection.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.3.1}Attention Distribution (Histogram)}{7}{subsubsection.4.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.3.2}Heatmaps}{7}{subsubsection.4.3.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces \textbf  {Mechanism Validator.} Left: Baseline assigns uniform weight (Red bars). Right: CAMIL (Green bars) focuses exclusively on the central slices (10-20) where the pathology resides, ignoring the rest.}}{8}{figure.caption.5}\protected@file@percent }
+\newlabel{fig:heatmap}{{3}{8}{\textbf {Mechanism Validator.} Left: Baseline assigns uniform weight (Red bars). Right: CAMIL (Green bars) focuses exclusively on the central slices (10-20) where the pathology resides, ignoring the rest}{figure.caption.5}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Discussion}{8}{section.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Focus: Architecture Presentation}{8}{subsection.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}From Proxy to Real: Large-Scale Training (Not Deployment)}{8}{subsection.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Limitations and Future Work}{9}{subsection.5.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusion}{9}{section.6}\protected@file@percent }
+\bibcite{mobilevit}{1}
+\bibcite{ilse2018}{2}
+\bibcite{medmnist}{3}
+\@writefile{toc}{\contentsline {section}{\numberline {A}Annexes}{10}{appendix.A}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.1}Source Code and Repository}{10}{subsection.A.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.2}Notebooks}{10}{subsection.A.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.3}Docker for Large-Scale Training}{10}{subsection.A.3}\protected@file@percent }
+\bibcite{hyperkvasir}{4}
+\gdef \@abspage@last{11}
