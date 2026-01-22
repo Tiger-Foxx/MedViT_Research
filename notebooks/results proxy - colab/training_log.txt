@@ -1,0 +1,130 @@
+MedViT-CAMIL PROXY Training Log
+Started: 2026-01-22 08:39:05.012987
+Dataset: Train: 1158 | Val: 165 | Test: 310
+============================================================
+
+============================================================
+🏃 ENTRAÎNEMENT BASELINE (Average Pooling)
+============================================================
+
+============================================================
+🔧 Baseline-AvgPool
+   Params: 5,028,322 total, 90,690 entraînables
+Epoch 1/30 | Train: 0.5870 / 71.2% | Val: 0.5650 / 74.5%
+   💾 Nouveau meilleur modèle: 74.55%
+Epoch 2/30 | Train: 0.5477 / 74.5% | Val: 0.5401 / 74.5%
+Epoch 3/30 | Train: 0.5312 / 74.9% | Val: 0.5099 / 75.8%
+   💾 Nouveau meilleur modèle: 75.76%
+Epoch 4/30 | Train: 0.5115 / 75.7% | Val: 0.4973 / 75.8%
+Epoch 5/30 | Train: 0.5116 / 76.8% | Val: 0.4909 / 78.8%
+   💾 Nouveau meilleur modèle: 78.79%
+Epoch 6/30 | Train: 0.5068 / 76.2% | Val: 0.4805 / 78.8%
+Epoch 7/30 | Train: 0.4821 / 78.3% | Val: 0.4698 / 80.0%
+   💾 Nouveau meilleur modèle: 80.00%
+Epoch 8/30 | Train: 0.4785 / 78.1% | Val: 0.4584 / 81.8%
+   💾 Nouveau meilleur modèle: 81.82%
+Epoch 9/30 | Train: 0.4696 / 79.6% | Val: 0.4493 / 83.0%
+   💾 Nouveau meilleur modèle: 83.03%
+Epoch 10/30 | Train: 0.4668 / 80.1% | Val: 0.4464 / 81.8%
+Epoch 11/30 | Train: 0.4596 / 80.9% | Val: 0.4558 / 80.0%
+Epoch 12/30 | Train: 0.4595 / 80.7% | Val: 0.4440 / 81.2%
+Epoch 13/30 | Train: 0.4470 / 82.0% | Val: 0.4368 / 83.0%
+Epoch 14/30 | Train: 0.4407 / 81.3% | Val: 0.4299 / 83.6%
+   💾 Nouveau meilleur modèle: 83.64%
+Epoch 15/30 | Train: 0.4393 / 82.2% | Val: 0.4338 / 83.0%
+Epoch 16/30 | Train: 0.4457 / 81.1% | Val: 0.4239 / 83.6%
+Epoch 17/30 | Train: 0.4320 / 82.0% | Val: 0.4213 / 84.2%
+   💾 Nouveau meilleur modèle: 84.24%
+Epoch 18/30 | Train: 0.4228 / 82.3% | Val: 0.4239 / 84.2%
+Epoch 19/30 | Train: 0.4283 / 82.1% | Val: 0.4224 / 83.6%
+Epoch 20/30 | Train: 0.4343 / 82.6% | Val: 0.4247 / 84.8%
+   💾 Nouveau meilleur modèle: 84.85%
+Epoch 21/30 | Train: 0.4239 / 82.5% | Val: 0.4154 / 82.4%
+Epoch 22/30 | Train: 0.4263 / 82.8% | Val: 0.4179 / 84.2%
+Epoch 23/30 | Train: 0.4222 / 82.4% | Val: 0.4133 / 83.0%
+Epoch 24/30 | Train: 0.4175 / 83.3% | Val: 0.4175 / 84.8%
+Epoch 25/30 | Train: 0.4200 / 82.8% | Val: 0.4140 / 84.2%
+Epoch 26/30 | Train: 0.4197 / 83.0% | Val: 0.4133 / 84.2%
+Epoch 27/30 | Train: 0.4225 / 83.3% | Val: 0.4134 / 84.2%
+Epoch 28/30 | Train: 0.4162 / 82.9% | Val: 0.4136 / 84.8%
+Epoch 29/30 | Train: 0.4180 / 83.1% | Val: 0.4128 / 84.2%
+Epoch 30/30 | Train: 0.4185 / 83.2% | Val: 0.4129 / 84.2%
+✅ Baseline-AvgPool Best Val Accuracy: 84.85%
+
+============================================================
+🏃 ENTRAÎNEMENT MedViT-CAMIL (Gated Attention)
+============================================================
+
+============================================================
+🔧 MedViT-CAMIL
+   Params: 5,111,011 total, 173,379 entraînables
+Epoch 1/30 | Train: 0.5345 / 73.6% | Val: 0.4572 / 81.8%
+   💾 Nouveau meilleur modèle: 81.82%
+Epoch 2/30 | Train: 0.4566 / 80.3% | Val: 0.4376 / 81.8%
+Epoch 3/30 | Train: 0.4338 / 81.4% | Val: 0.4059 / 84.2%
+   💾 Nouveau meilleur modèle: 84.24%
+Epoch 4/30 | Train: 0.4247 / 82.6% | Val: 0.4109 / 81.2%
+Epoch 5/30 | Train: 0.4143 / 83.2% | Val: 0.4037 / 84.8%
+   💾 Nouveau meilleur modèle: 84.85%
+Epoch 6/30 | Train: 0.4046 / 83.2% | Val: 0.4378 / 79.4%
+Epoch 7/30 | Train: 0.3889 / 82.9% | Val: 0.4266 / 81.8%
+Epoch 8/30 | Train: 0.3987 / 83.2% | Val: 0.4013 / 84.2%
+Epoch 9/30 | Train: 0.3784 / 83.7% | Val: 0.3922 / 84.8%
+Epoch 10/30 | Train: 0.3829 / 85.2% | Val: 0.4089 / 82.4%
+Epoch 11/30 | Train: 0.3655 / 84.1% | Val: 0.4257 / 81.2%
+Epoch 12/30 | Train: 0.3459 / 85.4% | Val: 0.4176 / 81.8%
+Epoch 13/30 | Train: 0.3498 / 84.8% | Val: 0.4010 / 84.2%
+Epoch 14/30 | Train: 0.3428 / 86.0% | Val: 0.3944 / 84.8%
+Epoch 15/30 | Train: 0.3293 / 87.1% | Val: 0.4734 / 83.0%
+Epoch 16/30 | Train: 0.3368 / 86.4% | Val: 0.3884 / 86.1%
+   💾 Nouveau meilleur modèle: 86.06%
+Epoch 17/30 | Train: 0.3263 / 86.3% | Val: 0.4137 / 84.2%
+Epoch 18/30 | Train: 0.3183 / 87.5% | Val: 0.3899 / 85.5%
+Epoch 19/30 | Train: 0.3229 / 87.3% | Val: 0.4392 / 84.8%
+Epoch 20/30 | Train: 0.3229 / 87.9% | Val: 0.4016 / 87.3%
+   💾 Nouveau meilleur modèle: 87.27%
+Epoch 21/30 | Train: 0.3259 / 87.3% | Val: 0.4053 / 85.5%
+Epoch 22/30 | Train: 0.3238 / 87.4% | Val: 0.4030 / 86.1%
+Epoch 23/30 | Train: 0.3078 / 87.7% | Val: 0.4023 / 85.5%
+Epoch 24/30 | Train: 0.3062 / 87.7% | Val: 0.4044 / 86.7%
+Epoch 25/30 | Train: 0.3054 / 87.1% | Val: 0.3894 / 86.7%
+Epoch 26/30 | Train: 0.2962 / 88.3% | Val: 0.3923 / 86.1%
+Epoch 27/30 | Train: 0.2940 / 87.7% | Val: 0.3959 / 85.5%
+Epoch 28/30 | Train: 0.2895 / 88.5% | Val: 0.3971 / 85.5%
+Epoch 29/30 | Train: 0.2927 / 88.7% | Val: 0.3943 / 86.7%
+Epoch 30/30 | Train: 0.3093 / 87.8% | Val: 0.3893 / 86.7%
+✅ MedViT-CAMIL Best Val Accuracy: 87.27%
+
+============================================================
+📊 ÉVALUATION FINALE SUR TEST SET
+============================================================
+
+RÉSULTATS (NoduleMNIST3D):
+  Baseline (Avg Pool) - Val: 84.85% | Test: 82.90%
+  MedViT-CAMIL        - Val: 87.27% | Test: 84.52%
+  Amélioration Test: +1.61%
+
+💾 Résultats sauvegardés: /content/drive/MyDrive/MedViT_Results/proxy/results_proxy.json
+
+============================================================
+📋 RÉSUMÉ FINAL
+============================================================
+Terminé: 2026-01-22 11:05:54.085350
+
+MÉTRIQUES:
+  Baseline Test Accuracy: 82.90%
+  CAMIL Test Accuracy:    84.52%
+  Amélioration:           +1.61%
+
+FICHIERS SAUVEGARDÉS dans /content/drive/MyDrive/MedViT_Results/proxy:
+  📄 config.json
+  📄 results_proxy.json
+  📄 training_log.txt
+  🖼️ training_curves_proxy.png
+  🖼️ attention_heatmap_proxy.png
+  🖼️ attention_distribution_proxy.png
+  🤖 Baseline-AvgPool_best.pth
+  🤖 MedViT-CAMIL_best.pth
+  📄 Baseline-AvgPool_history.json
+  📄 MedViT-CAMIL_history.json
+============================================================
